@@ -1,5 +1,4 @@
 import scrapy
-from datetime import datetime
 import os
 import logging
 
@@ -34,11 +33,4 @@ class EnviosCubaSpider(scrapy.Spider):
       product['store']    = response.meta['store']
       product['province'] = response.meta['province']
 
-      # product.rss.title       = product_element.css('div.thumbTitle a.invarseColor::text').get().encode('utf-8').strip()
-      # product.rss.link        = response.urljoin(product_element.css('div.thumbTitle a.invarseColor').attrib['href'])
-      # product.rss.guid        = response.urljoin(product_element.css('div.thumbTitle a.invarseColor').attrib['href'])
-      # product.rss.description = product_element.css('div.thumbTitle a.invarseColor::text').get().encode('utf-8').strip()
-      # product.rss.pub_date    = datetime.now()
-      # product.rss.enclosure   = {}
-      
       yield product
