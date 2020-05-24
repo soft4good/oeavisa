@@ -1,6 +1,11 @@
-import os
+import sys, os
 import time
 import logging
+from os.path import join, dirname
+from dotenv import load_dotenv
+
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
 # -*- coding: utf-8 -*-
 
@@ -86,8 +91,8 @@ FEEDS = {
   },
 }
 
-AWS_ACCESS_KEY_ID     = os.getenv('OEAVISA_AWS_ACCESS_KEY_ID', '')
-AWS_SECRET_ACCESS_KEY = os.getenv('OEAVISA_AWS_SECRET_ACCESS_KEY', '')
+AWS_ACCESS_KEY_ID     = os.getenv('OEAVISA_AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('OEAVISA_AWS_SECRET_ACCESS_KEY')
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
