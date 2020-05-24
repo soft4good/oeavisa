@@ -5,7 +5,7 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/items.html
 
-from scrapy     import Item, Field
+from scrapy import Item, Field
 # from scrapy_rss import RssedItem
 
 class OeAvisaProduct(Item):
