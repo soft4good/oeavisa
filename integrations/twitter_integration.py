@@ -2,7 +2,7 @@ import time, os, json, logging, random, tweepy
 from threading import Thread
 from dotenv import load_dotenv
 
-load_dotenv(dotenv_path= '.twitter.env')
+load_dotenv()
 logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger()
 
