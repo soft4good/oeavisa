@@ -28,6 +28,7 @@ class OeAvisaIntegration:
     'ya, no te preocupes mi herma.',
     'OK, tirado x la planta.',
     'anotado, el mío.'
+    'déjame eso a mí.'
   ]
 
   CANNED_RESPONSES = {

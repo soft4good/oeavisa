@@ -53,25 +53,26 @@ class TwitterIntegration(OeAvisaIntegration):
 
     return response
 
-
   def process_direct_message(self, message):
     clean_message = self.cleanup_message(message.message_create['message_data']['text'])
 
     sender_id = message.message_create['sender_id']
     response = self.CANNED_RESPONSES.get(clean_message)
     
-    if response is None and str(self.api.me().id) != str(sender_id):
+    if response:
+      try: self.api.send_direct_message(sender_id, response)
+      except Exception as error: logger.error(f'TWITTER_PROCESS_DIRECT_MESSAGE_SEND {error}')
+      return
+    elif str(self.api.me().id) != str(sender_id):
       logger.info(f'TWITTER_PROCESS_DIRECT_MESSAGE (clean): {clean_message}')
       user = self.api.get_user(sender_id)
+      
+      if response is None: response = random.sample(self.RESPONSES, 1)[0]      
+      
+      try: self.api.send_direct_message(sender_id, response)
+      except Exception as error: logger.error(f'TWITTER_PROCESS_DIRECT_MESSAGE_SEND {error}')
+
       self.register_query(clean_message, f'{message.id}:{user.id}:{user.screen_name}')
-    
-    if response is None: response = random.sample(self.RESPONSES, 1)[0]
-    
-    try:
-      self.api.send_direct_message(sender_id, response)
-      self.api.destroy_direct_message(message.id)
-    except Exception as error:
-      logger.error(f'TWITTER_PROCESS_DIRECT_MESSAGE {error}')
 
 
   def process_mention(self, tweet):
@@ -104,27 +105,29 @@ class TwitterIntegration(OeAvisaIntegration):
     except tweepy.TweepError as error:
       if error.api_code != 226: # This request looks like it might be automated. To protect our users from spam...
         try:
-          self.api.update_status( # respond to user asking to follow
-            status = f"@{screen_name} {self.FOLLOW_ME_ON_HIT}",
-            in_reply_to_status_id = tweet_id,
-          )
+          if not self.api.exists_friendship(user_id, self.api.me().id): # not follower?
+            self.api.update_status( # respond to user asking to follow
+              status = f"@{screen_name} {self.FOLLOW_ME_ON_HIT}",
+              in_reply_to_status_id = tweet_id,
+            )
         except Exception as error:
           logger.warning(f'TWITTER_PROCESS_HIT {error}')
       return False
 
   def consume_direct_messages(self):
     while True:
-      time.sleep(60)
       logger.info('TWITTER_CONSUME_DIRECT_MESSAGE Starting...')
       
       messages = self.api.list_direct_messages()
       for message in messages:
         time.sleep(5)
-        try:
-          self.process_direct_message(message)
-        except Exception as error:
-          logger.error(f'TWITTER_CONSUME_DIRECT_MESSAGE {error}')
-    
+        try: self.process_direct_message(message)
+        except Exception as error: logger.error(f'TWITTER_CONSUME_DIRECT_MESSAGE {error}')
+        time.sleep(5)
+        try: self.api.destroy_direct_message(message.id)
+        except Exception as error: logger.error(f'TWITTER_PROCESS_DIRECT_MESSAGE_DESTROY {error}')
+      
+      time.sleep(60)  
 
   def create_api(self):
     consumer_key = os.getenv("CONSUMER_KEY")
