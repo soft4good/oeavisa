@@ -128,14 +128,14 @@ class TwitterIntegration(OeAvisaIntegration):
       
       messages = self.api.list_direct_messages()
       for message in messages:
-        time.sleep(5)
-        try: self.process_direct_message(message)
-        except Exception as error: logger.error(f'TWITTER_CONSUME_DIRECT_MESSAGE {error}')
-        time.sleep(5)
+        time.sleep(10)
         try: self.api.destroy_direct_message(message.id)
         except Exception as error: logger.error(f'TWITTER_PROCESS_DIRECT_MESSAGE_DESTROY {error}')
+        time.sleep(10)
+        try: self.process_direct_message(message)
+        except Exception as error: logger.error(f'TWITTER_CONSUME_DIRECT_MESSAGE {error}')
       
-      time.sleep(60)  
+      time.sleep(120)
 
   def create_api(self):
     consumer_key = os.getenv("CONSUMER_KEY")
