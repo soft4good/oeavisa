@@ -17,6 +17,10 @@ class OeAvisaStreamListener(tweepy.StreamListener):
   def on_status(self, status):
     self.callback(status)
 
+  def on_exception(self, exception):
+    logger.error(exception)
+    return true # reconnect
+
 class TwitterIntegration(OeAvisaIntegration):
   NAME = 'twitter'
 
